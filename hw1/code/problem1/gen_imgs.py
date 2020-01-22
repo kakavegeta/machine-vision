@@ -1,5 +1,6 @@
 import os
 import cv2
+import numpy as np
 from cv249 import CV249
 
 gen_img_path = '../../result_imgs'
