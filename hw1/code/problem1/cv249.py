@@ -23,9 +23,9 @@ class CV249:
             np.array -- blurred image
         """
         # TODO: your implementation
-        kernel = np.ones(kernel_size)*(1/9);
+        kernel = np.ones(kernel_size, np.float32)/9
+        return cv2.filter2D(img, -1, kernel)
         
-        pass
 
     def sharpen_laplacian(self, img):
         """sharpen the image with laplacian filter
@@ -41,7 +41,8 @@ class CV249:
         # when have a negative center in the laplacian kernel
 
         # TODO: your implementation
-        pass
+        lap_kernel = np.array([[0,1,0],[1,-4,1],[0,1,0]])
+        return img - cv2.filter2D(img, -1, lap_kernel)        
 
     def unsharp_masking(self, img):
         """sharpen the image via unsharp masking
@@ -55,7 +56,9 @@ class CV249:
         # use don't use cv2 in this function
         
         # TODO: your implementation
-        pass
+        smoothed = self.blur(img, (3,3))
+        masked = img - smoothed
+        return img + masked
 
     def edge_det_sobel(self, img):
         """detect edges with sobel filter
@@ -68,6 +71,8 @@ class CV249:
         """
 
         # TODO: your implementation
+        kx = np.array([[-1,0,1],[-2,0,2],[-1,0,1]])
+        ky = np.array([[-1,-2,-1],[0,0,0],[1,2,1]])
         pass
 
 if __name__ == "__main__":
@@ -77,7 +82,22 @@ if __name__ == "__main__":
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     print(gray.shape)
     print(np.mean(np.abs(gray - my_gray)))
-    cv2.imshow('image',gray)
+    print(img[0, 0, 0], img[0, 0, 1], img[0, 0, 2])
     #cv2.imshow('image', my_gray)
     if(np.mean(np.abs(gray - my_gray)) < 2e-3):
         print("pass")
+    blur = cv2.blur(img, ksize=(3,3))
+    my_blur = cv249.blur(img,(3,3))
+    if(np.all(my_blur==blur)):
+        print("pass")
+    
+    lap_sharp = img - cv2.Laplacian(img, -1, ksize=1)
+    my_lap_sharp = cv249.sharpen_laplacian(img)
+    if(np.all(my_lap_sharp == lap_sharp)):
+        print("pass lap sharp")
+    
+    masked_img = img - cv2.blur(img, ksize=(3, 3))
+    unsharp_mask_img = img + masked_img
+    my_unsharp_mask_img = cv249.unsharp_masking(img)
+    if(np.all(my_unsharp_mask_img==unsharp_mask_img)):
+        print("pass unsharped mask")
