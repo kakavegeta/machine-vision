@@ -8,7 +8,7 @@ class CV249:
         # Note that cv2.imread will read the image to BGR space rather than RGB space
 
         # TODO: your implementation
-        return img.dot(np.array([0.114, 0.587, 0.299]))
+        return img.dot(np.array([0.114, 0.587, 0.299])).astype(np.float32)
 
     def blur(self, img, kernel_size=(3, 3)):
         """smooth the image with box filter
@@ -71,9 +71,13 @@ class CV249:
         """
 
         # TODO: your implementation
-        kx = np.array([[-1,0,1],[-2,0,2],[-1,0,1]])
-        ky = np.array([[-1,-2,-1],[0,0,0],[1,2,1]])
-        pass
+        kx = np.flip(np.array([[-1,0,1],[-2,0,2],[-1,0,1]]))
+        ky = np.flip(np.array([[-1,-2,-1],[0,0,0],[1,2,1]]))
+        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).astype(np.float32)
+        g_x = cv2.filter2D(gray_img, -1, kx)
+        g_y = cv2.filter2D(gray_img, -1, ky)
+        g = np.sqrt(g_x**2 + g_y**2)
+        return g.astype(np.uint8)
 
 if __name__ == "__main__":
     cv249 = CV249()
@@ -101,3 +105,13 @@ if __name__ == "__main__":
     my_unsharp_mask_img = cv249.unsharp_masking(img)
     if(np.all(my_unsharp_mask_img==unsharp_mask_img)):
         print("pass unsharped mask")
+
+    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).astype(np.float32)
+    g_x = cv2.Sobel(gray_img, -1, 1, 0, ksize=3)
+    g_y = cv2.Sobel(gray_img, -1, 0, 1, ksize=3)
+    g = np.sqrt(g_x ** 2 + g_y ** 2).astype(np.uint8)
+    my_g = cv249.edge_det_sobel(img)
+    print(g.shape, my_g.shape)
+    if(np.all(g==my_g)):
+        print("pass sobel")
+
