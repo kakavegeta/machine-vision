@@ -73,9 +73,8 @@ class CV249:
         # TODO: your implementation
         kx = np.flip(np.array([[-1,0,1],[-2,0,2],[-1,0,1]]))
         ky = np.flip(np.array([[-1,-2,-1],[0,0,0],[1,2,1]]))
-        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).astype(np.float32)
-        g_x = cv2.filter2D(gray_img, -1, kx)
-        g_y = cv2.filter2D(gray_img, -1, ky)
+        g_x = cv2.filter2D(img, -1, kx)
+        g_y = cv2.filter2D(img, -1, ky)
         g = np.sqrt(g_x**2 + g_y**2)
         return g.astype(np.uint8)
 
