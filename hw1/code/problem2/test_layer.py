@@ -12,26 +12,24 @@ class TestLayer(unittest.TestCase):
             self.conv_cases = pickle.load(conv_f)
             self.max_pool_cases = pickle.load(max_pool_f)
             self.avg_pool_cases = pickle.load(avg_pool_f)
-    
+
     def test_conv(self):
         for case in self.conv_cases:
             weight = case['weight']
-            out_c, in_c, h, w = weight.shape
+            kernel_size = weight.shape
             bias = case['bias']
             x = case['x']
             out = case['out']
             stride = case['stride']
             pad = case['pad']
-            
-            conv = Conv2D(in_channel=in_c,
-                          out_channel=out_c,
-                          kernel_size=(h, w),
+
+            conv = Conv2D(kernel_size=kernel_size,
                           stride=stride,
                           padding=pad)
             conv.W = weight
             conv.b = bias
             test_out = conv(x)
-            self.assertTrue(np.allclose(out, test_out))
+            self.assertTrue(np.allclose(out, test_out, rtol=1e-3))
 
     def test_max_pool(self):
         for case in self.max_pool_cases:

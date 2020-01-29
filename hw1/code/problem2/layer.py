@@ -5,10 +5,8 @@ class Conv2D(object):
     """2D convolutional layer.
 
     Arguments:
-        in_channel: number of input channel
-        out_channel: number of output channel
         kernel_size (tuple): the shape of the kernel. It is a tuple = (
-            kernel_height, kernel_width).
+            out_channels, in_channels, kernel_height, kernel_width).
         strides (int or tuple): the strides of the convolution operation.
             padding (int or tuple): number of zero paddings.
         weights_init (obj):  an object instantiated using any initializer class
@@ -33,7 +31,7 @@ class Conv2D(object):
     """
 
     def __init__(
-            self, in_channel, out_channel, kernel_size, stride, padding):
+            self, kernel_size, stride, padding):
         self.W = np.random.randn(*kernel_size)
         self.b = np.random.randn(kernel_size[0], 1)
         self.kernel_size = kernel_size
@@ -44,7 +42,7 @@ class Conv2D(object):
         return "{}({}, {}, {})".format(
             self.name, self.kernel_size, self.stride, self.padding
         )
-    
+
     def __call__(self, x):
         return self.forward(x)
 
@@ -92,7 +90,7 @@ class MaxPool2D:
 
     def forward(self, x):
         """Compute the layer output.
-        
+
         Arguments:
             x {[np.array]} -- the input of the layer. A 3D array of shape (
                               in_channels, in_heights, in_weights).
@@ -132,7 +130,7 @@ class AvgPool2D:
 
     def forward(self, x):
         """Compute the layer output.
-        
+
         Arguments:
             x {[np.array]} -- the input of the layer. A 3D array of shape (
                               in_channels, in_heights, in_weights).
