@@ -31,12 +31,14 @@ class Conv2D(object):
     """
 
     def __init__(
-            self, kernel_size, stride, padding):
+            self, kernel_size, stride, padding, name = "Cov2D"):
         self.W = np.random.randn(*kernel_size)
         self.b = np.random.randn(kernel_size[0], 1)
         self.kernel_size = kernel_size
         self.stride = (stride, stride) if type(stride) == int else stride
         self.padding = (padding, padding) if type(padding) == int else padding
+        self.name = name
+
 
     def __repr__(self):
         return "{}({}, {}, {})".format(
@@ -70,12 +72,24 @@ class Conv2D(object):
                 'Width doesn\'t work'
 
         # TODO: Put your code below
-        pass
+        H, W, F_H, F_W = x.shape[1], x.shape[2], self.W.shape[2], self.W.shape[3]
+        CC = self.W.shape[0] # output channels
 
+        HH = (H - F_H + 2*p[0]) // s[0] + 1 # output height
+        WW = (W - F_W + 2*p[1]) // s[1] + 1 # output width
+        
+        OO = np.zeros((CC, HH, WW))
+        # convolve
+        for hh in range(HH):
+            for ww in range(WW):
+                for cc in range(CC):
+                    _x = x_padded[:, hh*s[0]:hh*s[0]+F_H, ww*s[1]:ww*s[1]+F_W]
+                    OO[cc, hh, ww] = np.sum(_x * self.W[cc, :, :, :]) + self.b[cc]
+        return OO
 
 class MaxPool2D:
     def __init__(self, kernel_size, stride, padding, name="MaxPool2D"):
-        self.kernel_size = kernel_size
+        self.kernel_size = kernel_size # len(kernel_size == 2)
         self.stride = (stride, stride) if type(stride) == int else stride
         self.padding = (padding, padding) if type(padding) == int else padding
         self.name = name
@@ -110,7 +124,17 @@ class MaxPool2D:
                 'Width doesn\'t work'
 
         # TODO: Put your code below
-        pass
+        H, W, F_H, F_W = x.shape[1], x.shape[2], self.kernel_size[0], self.kernel_size[1]
+        CC = x_padded.shape[0]
+        WW = (W - F_W + 2*p[1]) // s[1] + 1 # output width
+        HH = (H - F_H + 2*p[0]) // s[0] + 1 # output height
+        OO = np.zeros((CC, HH, WW))
+        for hh in range(HH):
+            for ww in range(WW):
+                for cc in range(CC):
+                    OO[cc, hh, ww] = np.max(x_padded[cc, hh*s[0]:hh*s[0]+F_H, ww*s[1]:ww*s[1]+F_W])
+        return OO
+
 
 
 class AvgPool2D:
@@ -150,4 +174,14 @@ class AvgPool2D:
                 'Width doesn\'t work'
 
         # TODO: Put your code below
-        pass
+                # TODO: Put your code below
+        H, W, F_H, F_W = x.shape[1], x.shape[2], self.kernel_size[0], self.kernel_size[1]
+        CC = x_padded.shape[0]
+        WW = (W - F_W + 2*p[1]) // s[1] + 1 # output width
+        HH = (H - F_H + 2*p[0]) // s[0] + 1 # output height
+        OO = np.zeros((CC, HH, WW))
+        for hh in range(HH):
+            for ww in range(WW):
+                for cc in range(CC):
+                    OO[cc, hh, ww] = np.mean(x_padded[cc, hh*s[0]:hh*s[0]+F_H, ww*s[1]:ww*s[1]+F_W])
+        return OO

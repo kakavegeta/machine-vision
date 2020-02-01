@@ -8,7 +8,7 @@ class CV249:
         # Note that cv2.imread will read the image to BGR space rather than RGB space
 
         # TODO: your implementation
-        return img.dot(np.array([0.114, 0.587, 0.299])).astype(np.float32)
+        return np.rint(img.dot(np.array([0.114, 0.587, 0.299])))
 
     def blur(self, img, kernel_size=(3, 3)):
         """smooth the image with box filter
