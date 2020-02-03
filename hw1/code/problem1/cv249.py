@@ -78,39 +78,4 @@ class CV249:
         g = np.sqrt(g_x**2 + g_y**2)
         return g.astype(np.uint8)
 
-if __name__ == "__main__":
-    cv249 = CV249()
-    img = cv2.imread('../../data/lena.tiff')
-    my_gray = cv249.cvt_to_gray(img)
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    print(gray.shape)
-    print(np.mean(np.abs(gray - my_gray)))
-    print(img[0, 0, 0], img[0, 0, 1], img[0, 0, 2])
-    #cv2.imshow('image', my_gray)
-    if(np.mean(np.abs(gray - my_gray)) < 2e-3):
-        print("pass")
-    blur = cv2.blur(img, ksize=(3,3))
-    my_blur = cv249.blur(img,(3,3))
-    if(np.all(my_blur==blur)):
-        print("pass")
-    
-    lap_sharp = img - cv2.Laplacian(img, -1, ksize=1)
-    my_lap_sharp = cv249.sharpen_laplacian(img)
-    if(np.all(my_lap_sharp == lap_sharp)):
-        print("pass lap sharp")
-    
-    masked_img = img - cv2.blur(img, ksize=(3, 3))
-    unsharp_mask_img = img + masked_img
-    my_unsharp_mask_img = cv249.unsharp_masking(img)
-    if(np.all(my_unsharp_mask_img==unsharp_mask_img)):
-        print("pass unsharped mask")
-
-    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).astype(np.float32)
-    g_x = cv2.Sobel(gray_img, -1, 1, 0, ksize=3)
-    g_y = cv2.Sobel(gray_img, -1, 0, 1, ksize=3)
-    g = np.sqrt(g_x ** 2 + g_y ** 2).astype(np.uint8)
-    my_g = cv249.edge_det_sobel(img)
-    print(g.shape, my_g.shape)
-    if(np.all(g==my_g)):
-        print("pass sobel")
 
