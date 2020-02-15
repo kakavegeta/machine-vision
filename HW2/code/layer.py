@@ -81,6 +81,10 @@ class FullyConnected(object):
         dv_W = np.empty(self.W.shape, dtype=np.float32)
         dv_b = np.empty(self.b.shape, dtype=np.float32)
 
+        dv_x = np.dot(dv_y, self.W).T
+        dv_W = np.dot(dv_y.reshape(dv_y.shape[0], 1), x.reshape(1, x.shape[0]))
+        dv_b = dv_y
+
         # don't change the order of return values
         return dv_x, dv_W, dv_b
 
@@ -209,6 +213,19 @@ class Conv2D(object):
         dv_W = np.empty(self.W.shape, dtype=np.float32)
         dv_b = np.empty(self.b.shape, dtype=np.float32)
         dv_x = np.empty(x.shape, dtype=np.float32)
+
+        dv_b = dv_y
+
+        fh, fw = self.W.shape[2], self.W.shape[3]
+        HH, WW = dv_y.shape[1], dv_y.shape[2]
+        H, W = x.shape[1], x.shape[2]
+
+        for o in range(self.W.shape[0]):
+            for i in range(self.W.shape[1]):
+                for h in range(HH):
+                    for w in range(WW):
+                        dv_W[o, i, :, :] += dv_y[o, h, w] * x_padded[i, h*s[0]:h*s[0]+fh, w*s[1]:w*s[1]+fw]
+                        dv_x[i, h*s[0]:h*s[0]+fh, w*s[1]:w*s[1]+fw] += dv_y[o, h, w] * self.W[o, i, :, :].T
 
         # don't change the order of return values
         return dv_x, dv_W, dv_b

@@ -37,6 +37,9 @@ class TestBackProp(unittest.TestCase):
             test_out = conv(x)
             dv_x, dv_W, dv_b = conv.backward(x, grad_output)
 
+            print(dv_W)
+            print(grad_w)
+
             self.assertTrue(np.allclose(out, test_out, rtol=0.0001))
 
             self.assertTrue(np.allclose(grad_x, dv_x, rtol=0.0001))
