@@ -210,24 +210,27 @@ class Conv2D(object):
 
         # TODO: write your implementation below
 
-        dv_W = np.empty(self.W.shape, dtype=np.float32)
-        dv_b = np.empty(self.b.shape, dtype=np.float32)
-        dv_x = np.empty(x.shape, dtype=np.float32)
+        dv_W = np.zeros(self.W.shape, dtype=np.float64)
+        dv_b = np.zeros(self.b.shape, dtype=np.float64)
+        dv_x = np.zeros(x.shape, dtype=np.float64)
 
-        dv_b = dv_y
+        dv_x_padded = np.pad(
+            dv_x, ((0, 0), (p[0], p[0]), (p[1], p[1])), mode = 'constant'
+        )
+
 
         fh, fw = self.W.shape[2], self.W.shape[3]
-        HH, WW = dv_y.shape[1], dv_y.shape[2]
-        H, W = x.shape[1], x.shape[2]
+        HH, WW = dv_y.shape[1], dv_y.shape[2] # output height, weight
+        H, W = x.shape[1], x.shape[2] # input height, weight
 
         for o in range(self.W.shape[0]):
-            for i in range(self.W.shape[1]):
                 for h in range(HH):
                     for w in range(WW):
-                        dv_W[o, i, :, :] += dv_y[o, h, w] * x_padded[i, h*s[0]:h*s[0]+fh, w*s[1]:w*s[1]+fw]
-                        dv_x[i, h*s[0]:h*s[0]+fh, w*s[1]:w*s[1]+fw] += dv_y[o, h, w] * self.W[o, i, :, :]
-
+                        dv_W[o, :, :, :] += dv_y[o, h, w] * x_padded[:, h*s[0]:h*s[0]+fh, w*s[1]:w*s[1]+fw]
+                        dv_x_padded[:, h*s[0]:h*s[0]+fh, w*s[1]:w*s[1]+fw] += dv_y[o, h, w] * self.W[o, :, :, :]
+                        dv_b[o] += dv_y[o, h, w]
         # don't change the order of return values
+        dv_x = dv_x_padded[:, p[0]:H-p[0], p[1]:W-p[1]]
         return dv_x, dv_W, dv_b
 
 
@@ -306,8 +309,29 @@ class MaxPool2D:
             x, ((0, 0), (p[0], p[0]), (p[1], p[1])), mode='constant'
         )
 
+
+        fh, fw = self.kernel_size[0], self.kernel_size[1]
+        HH, WW = dv_y.shape[1], dv_y.shape[2]
+        H, W = x.shape[1], x.shape[2]
+
         # TODO: write your implementation below
-        dv_x = np.empty(x.shape, dtype=np.float32)
+        dv_x = np.zeros(x.shape, dtype=np.float64)
+
+        dv_x_padded = np.pad(
+            dv_x, ((0, 0), (p[0], p[0]), (p[1], p[1])), mode='constant'
+        )
+
+        mask = lambda x: x==np.max(x)
+
+        for h in range(HH):
+            for w in range(WW):
+                for o in range(dv_y.shape[0]):
+                    #masked = mask(x_padded[:, h*s[0]:h*s[0]+fh, w*s[1]:w*s[1]+fw])
+                    #dv_x_padded[:, h*s[0]:h*s[0]+fh, w*s[1]:w*s[1]+fw] += np.multiply(masked, dv_y[o,h,w])
+                    masked = mask(x_padded[:, h:h+fh, w:w+fw])
+                    dv_x[:, h:h+fh, w:w+fw] += np.multiply(masked, dv_y[o,h,w])
+
+        #dv_x = dv_x_padded[:, p[0]:H-p[0], p[1]:W-p[1]]
 
         return dv_x
 

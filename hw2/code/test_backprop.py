@@ -37,9 +37,6 @@ class TestBackProp(unittest.TestCase):
             test_out = conv(x)
             dv_x, dv_W, dv_b = conv.backward(x, grad_output)
 
-            print(dv_W)
-            print(grad_w)
-
             self.assertTrue(np.allclose(out, test_out, rtol=0.0001))
 
             self.assertTrue(np.allclose(grad_x, dv_x, rtol=0.0001))
@@ -59,6 +56,9 @@ class TestBackProp(unittest.TestCase):
             max_pool = MaxPool2D(kernel_size=kernel, stride=stride, padding=pad)
             test_out = max_pool(x)
             dv_x = max_pool.backward(x, grad_output)
+
+            print(dv_x)
+            print(grad_x)
 
             self.assertTrue(np.allclose(out, test_out))
 
