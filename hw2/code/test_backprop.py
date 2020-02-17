@@ -57,9 +57,6 @@ class TestBackProp(unittest.TestCase):
             test_out = max_pool(x)
             dv_x = max_pool.backward(x, grad_output)
 
-            print(dv_x)
-            print(grad_x)
-
             self.assertTrue(np.allclose(out, test_out))
 
             self.assertTrue(np.allclose(grad_x, dv_x, rtol=0.0001))

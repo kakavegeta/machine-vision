@@ -321,15 +321,18 @@ class MaxPool2D:
             dv_x, ((0, 0), (p[0], p[0]), (p[1], p[1])), mode='constant'
         )
 
+        print(dv_x.shape)
+        print(dv_y.shape)
+
         mask = lambda x: x==np.max(x)
 
         for h in range(HH):
             for w in range(WW):
-                for o in range(dv_y.shape[0]):
+                for o in range(dv_y.shape[0]): # dv_y.shape==dv_x.shape
                     #masked = mask(x_padded[:, h*s[0]:h*s[0]+fh, w*s[1]:w*s[1]+fw])
                     #dv_x_padded[:, h*s[0]:h*s[0]+fh, w*s[1]:w*s[1]+fw] += np.multiply(masked, dv_y[o,h,w])
-                    masked = mask(x_padded[:, h:h+fh, w:w+fw])
-                    dv_x[:, h:h+fh, w:w+fw] += np.multiply(masked, dv_y[o,h,w])
+                    masked = mask(x[o, h:h+fh, w:w+fw])
+                    dv_x[o, h:h+fh, w:w+fw] += np.multiply(masked, dv_y[o,h,w])
 
         #dv_x = dv_x_padded[:, p[0]:H-p[0], p[1]:W-p[1]]
 
