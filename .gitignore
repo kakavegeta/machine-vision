@@ -132,3 +132,5 @@ dmypy.json
 .vscode/
 
 .DS_Store
+
+hw3/csc249tracking/dataset/OTB2015/*.zip
