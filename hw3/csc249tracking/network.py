@@ -38,8 +38,7 @@ class DCFNet(nn.Module):
         # TODO: You are required to calculate response using self.wf to do cross correlation on the searching patch z
         # put your code here
         zf = torch.rfft(z, signal_ndim=2)
-        lambda w, z: 
-
+        
 
 
 

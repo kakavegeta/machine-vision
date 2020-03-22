@@ -134,3 +134,5 @@ dmypy.json
 .DS_Store
 
 hw3/csc249tracking/dataset/OTB2015/*.zip
+hw3/csc249tracking/dataset/
+hw3/csc249tracking/data/

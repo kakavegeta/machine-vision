@@ -82,12 +82,6 @@ def train(trainloader, net, optimizer, criterion, epoch=6):
                 running_loss = 0.0
     print("finished training")
 
-            
-
-
-
-
-
 def test(testloader, net):
     # test over whole dataset
     correct = 0
