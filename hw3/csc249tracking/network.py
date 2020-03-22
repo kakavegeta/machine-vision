@@ -2,6 +2,18 @@ import torch.nn as nn
 import torch
 
 
+def complex_mul(x, z):
+    out_real = x[..., 0] * z[..., 0] - x[..., 1] * z[..., 1]
+    out_imag = x[..., 0] * z[..., 1] + x[..., 1] * z[..., 0]
+    return torch.stack((out_real, out_imag), -1)
+
+
+def complex_mulconj(x, z):
+    out_real = x[..., 0] * z[..., 0] + x[..., 1] * z[..., 1]
+    out_imag = x[..., 1] * z[..., 0] - x[..., 0] * z[..., 1]
+    return torch.stack((out_real, out_imag), -1)
+
+
 class DCFNetFeature(nn.Module):
     def __init__(self):
         super(DCFNetFeature, self).__init__()
@@ -37,11 +49,14 @@ class DCFNet(nn.Module):
         z = self.feature(z) * self.config.cos_window
         # TODO: You are required to calculate response using self.wf to do cross correlation on the searching patch z
         # put your code here
-        zf = torch.rfft(z, signal_ndim=2)
+
+        # helper function to calculate complex multipulation
+        # c_mul = lambda x, z: torch.stack((x[:,0]*z[:,0]-x[:,1]*z[:,1], x[:,0]*z[:,1]+x[:,1]*z[:,0]),-1)
+        # c_mul_conj = lambda x, z:torch.stack((x[:,0]*z[:,0]+x[:,1]*z[:,1], x[:,0]*z[:,1]-x[:,1]*z[:,0]),-1)
         
-
-
-
+        zf = torch.rfft(z, signal_ndim=2)
+        kzzf = torch.sum(complex_mulconj(zf, self.xf), dim=1, keepdim=True)
+        response = torch.irfft(complex_mul(kzzf, self.wf), signal_ndim=2)
         return response
 
     def update(self, x, lr=1.0):
@@ -65,8 +80,15 @@ class DCFNet(nn.Module):
         x = self.feature(x) * self.config.cos_window
         # TODO: calculate self.xf and self.wf
         # put your code here
-
-
+        xf = torch.rfft(x, signal_ndim=2)
+        kxzf = torch.sum(torch.sum(xf**2, dim=4, keepdim=True), dim=1, keepdim=True)
+        wf = self.config.yf / (kxzf + self.config.lambda0)
+        if lr > 0.99:
+            self.wf = wf
+            self.xf = xf
+        else:
+            self.wf = (1-lr) * self.wf.data + lr * wf.data
+            self.xf = (1-lr) * self.xf.data + lr * xf.data
 
 
     def load_param(self, path='param.pth'):
