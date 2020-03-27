@@ -2,18 +2,6 @@ import torch.nn as nn
 import torch
 
 
-def complex_mul(x, z):
-    out_real = x[..., 0] * z[..., 0] - x[..., 1] * z[..., 1]
-    out_imag = x[..., 0] * z[..., 1] + x[..., 1] * z[..., 0]
-    return torch.stack((out_real, out_imag), -1)
-
-
-def complex_mulconj(x, z):
-    out_real = x[..., 0] * z[..., 0] + x[..., 1] * z[..., 1]
-    out_imag = x[..., 1] * z[..., 0] - x[..., 0] * z[..., 1]
-    return torch.stack((out_real, out_imag), -1)
-
-
 class DCFNetFeature(nn.Module):
     def __init__(self):
         super(DCFNetFeature, self).__init__()
@@ -51,8 +39,11 @@ class DCFNet(nn.Module):
         # put your code here
 
         # helper function to calculate complex multipulation
-        # c_mul = lambda x, z: torch.stack((x[:,0]*z[:,0]-x[:,1]*z[:,1], x[:,0]*z[:,1]+x[:,1]*z[:,0]),-1)
-        # c_mul_conj = lambda x, z:torch.stack((x[:,0]*z[:,0]+x[:,1]*z[:,1], x[:,0]*z[:,1]-x[:,1]*z[:,0]),-1)
+        
+        complex_mul = lambda x, z: torch.stack((x[...,0]*z[...,0]-x[...,1]*z[...,1], \
+         x[...,0]*z[...,1]+x[...,1]*z[...,0]),-1)
+        complex_mulconj = lambda x, z:torch.stack((x[...,0]*z[...,0]+x[...,1]*z[...,1], \
+         x[...,1]*z[...,0]-x[...,0]*z[...,1]),-1)
         
         zf = torch.rfft(z, signal_ndim=2)
         kzzf = torch.sum(complex_mulconj(zf, self.xf), dim=1, keepdim=True)

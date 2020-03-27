@@ -31,7 +31,7 @@ class TrackerConfig(object):
     lambda0 = 1e-4
     padding = 2
     output_sigma_factor = 0.1
-    interp_factor = 0.01
+    interp_factor = 1
     num_scale = 3
     scale_step = 1.0275
     scale_factor = scale_step ** (np.arange(num_scale) - num_scale / 2)
